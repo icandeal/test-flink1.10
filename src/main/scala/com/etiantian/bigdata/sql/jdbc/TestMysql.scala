@@ -1,4 +1,4 @@
-package com.etiantian.bigdata.sql
+package com.etiantian.bigdata.sql.jdbc
 
 import org.apache.flink.api.java.io.jdbc.{JDBCOptions, JDBCTableSource}
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
@@ -9,6 +9,7 @@ import org.apache.flink.types.Row
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api.scala._
+
 /**
  * Created by yuchunfan on 2020/3/6.
  */

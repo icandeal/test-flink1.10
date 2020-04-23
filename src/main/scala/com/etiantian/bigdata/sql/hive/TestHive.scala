@@ -1,10 +1,11 @@
-package com.etiantian.bigdata.sql
+package com.etiantian.bigdata.sql.hive
 
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.table.api.EnvironmentSettings
 import org.apache.flink.table.api.scala.StreamTableEnvironment
 import org.apache.flink.table.catalog.hive.HiveCatalog
 import org.apache.flink.api.scala._
+import org.apache.flink.table.api.scala._
 /**
  * Created by yuchunfan on 2020/3/6.
  */
