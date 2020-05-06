@@ -58,9 +58,8 @@ class TableSinkPoint(esHosts: String) extends TablePoint{
          |)
          |""".stripMargin)
 
-    tenv.sqlUpdate(
+    val testPerformanceTable = tenv.sqlQuery(
       """
-        |INSERT INTO test_performance
         |SELECT
         | user_id,
         | COUNT(DISTINCT task_id) task_count,
@@ -76,6 +75,32 @@ class TableSinkPoint(esHosts: String) extends TablePoint{
         | proctime BETWEEN proctime - INTERVAL '5' MINUTE AND proctime
         |GROUP BY user_id
         |""".stripMargin)
+
+    testPerformanceTable.insertInto("test_performance")
+
+//    tenv.createTemporaryView("tpf", testPerformanceTable)
+//
+//    tenv.sqlQuery(
+//      """
+//        |SELECT
+//        | b.`ref` AS user_ref,
+//        | LAST_VALUE(b.user_id),
+//        | LAST_VALUE(b.ett_user_id) AS jid,
+//        | LAST_VALUE(task_count),
+//        | LAST_VALUE(course_count),
+//        | LAST_VALUE(sum_task_type),
+//        | LAST_VALUE(sum_creteria_type),
+//        | LAST_VALUE(sum_time),
+//        | LAST_VALUE(sum_create),
+//        | LAST_VALUE(sum_other),
+//        | MAX(max_proctime) AS m_time
+//        |FROM tpf AS a
+//        |INNER JOIN user_info
+//        | FOR SYSTEM_TIME AS OF a.max_proctime AS b
+//        | ON a.user_id = b.`ref`
+//        |GROUP BY b.`ref`
+//        |""".stripMargin).insertInto("test_result_flink")
+
     null
   }
 }

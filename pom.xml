@@ -9,7 +9,7 @@
         <scala.version>2.11.12</scala.version>
         <flink.version>1.10.0</flink.version>
         <hive.version>2.3.4</hive.version>
-        <hbase.version>1.4.3</hbase.version>
+        <hbase.version>1.2.0-cdh5.16.2</hbase.version>
     </properties>
 
     <dependencies>
@@ -34,12 +34,18 @@
             <version>5.1.46</version>
         </dependency>
         <!-- Hive Dependency -->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-shaded-hadoop-2-uber</artifactId>
-            <version>2.6.5-9.0</version>
-            <scope>provided</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.flink</groupId>-->
+<!--            <artifactId>flink-shaded-hadoop-2-uber</artifactId>-->
+<!--            <version>2.6.5-9.0</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.flink</groupId>-->
+<!--            <artifactId>flink-connector-hive_2.11</artifactId>-->
+<!--            <version>${flink.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.apache.hbase</groupId>
@@ -53,12 +59,14 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-elasticsearch6_2.11</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-kafka-0.11_2.11</artifactId>
             <version>${flink.version}</version>
+<!--            <scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -68,15 +76,9 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-hive_2.11</artifactId>
-            <version>${flink.version}</version>
-<!--            <scope>provided</scope>-->
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
             <artifactId>flink-jdbc_2.11</artifactId>
             <version>${flink.version}</version>
-<!--            <scope>provided</scope>-->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -145,6 +147,13 @@
         <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
             <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
                 <version>2.15.2</version>
@@ -194,7 +203,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.etiantian.bigdata.sql.TestSqlConnector</mainClass>
+                            <mainClass>com.etiantian.bigdata.sql.hbase.TestHBaseWrite</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

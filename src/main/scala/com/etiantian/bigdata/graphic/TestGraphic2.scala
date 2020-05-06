@@ -56,6 +56,11 @@ object TestGraphic2 {
 
     graph.addPoint("PreMap", new PreMap)
     graph.addPoint("JsonHandlerMap", new JsonHandlerMap)
+    graph.addPoint("MysqlTablePoint", new MysqlTablePoint(
+      properties.getProperty("connector.mysql.url"),
+      properties.getProperty("connector.mysql.username"),
+      properties.getProperty("connector.mysql.password")
+    ))
     graph.addPoint("TableSinkPoint", new TableSinkPoint(properties.getProperty("connector.es.hosts")))
 //    graph.addPoint("PrintEnd", new PrintEnd)
 
