@@ -9,7 +9,7 @@ import org.apache.flink.table.descriptors.DescriptorProperties;
  */
 @Internal
 public class EttHBaseValidator extends ConnectorDescriptorValidator {
-    public static final String CONNECTOR_TYPE_VALUE_HBASE = "hbase";
+    public static final String CONNECTOR_TYPE_VALUE_HBASE = "etthbase";
     public static final String CONNECTOR_TABLE_NAME = "connector.table-name";
     public static final String CONNECTOR_ZK_QUORUM = "connector.zookeeper.quorum";
     public static final String CONNECTOR_ZK_NODE_PARENT = "connector.zookeeper.znode.parent";
@@ -22,7 +22,7 @@ public class EttHBaseValidator extends ConnectorDescriptorValidator {
 
     public void validate(DescriptorProperties properties) {
         super.validate(properties);
-        properties.validateValue("connector.type", "hbase", false);
+        properties.validateValue("connector.type", CONNECTOR_TYPE_VALUE_HBASE, false);
         properties.validateString("connector.table-name", false, 1);
         properties.validateString("connector.zookeeper.quorum", false, 1);
         properties.validateString("connector.zookeeper.znode.parent", true, 1);

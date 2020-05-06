@@ -42,7 +42,7 @@ object TestHBaseWrite {
 //        | rowkey STRING,
 //        | info Row(uid STRING, name STRING, age STRING)
 //        |) WITH (
-//        | 'connector.type' = 'hbase',
+//        | 'connector.type' = 'etthbase',
 //        | 'connector.table-name' = 'test_user',
 //        | 'connector.zookeeper.quorum' = 'test-hadoop1:2181,test-hadoop2:2181,test-hadoop3:2181',
 //        | 'connector.zookeeper.znode.parent' = '/hbase',

@@ -65,7 +65,7 @@ object TestHBaseRead {
 //        | rowkey STRING,
 //        | info Row(ett_user_id STRING, dc_school_id STRING)
 //        |) WITH (
-//        | 'connector.type' = 'hbase',
+//        | 'connector.type' = 'etthbase',
 //        | 'connector.table-name' = 'user_info_mysql_user_id',
 //        | 'connector.zookeeper.quorum' = 'test-hadoop1:2181,test-hadoop2:2181,test-hadoop3:2181',
 //        | 'connector.zookeeper.znode.parent' = '/hbase',

@@ -5,6 +5,8 @@ import org.apache.flink.configuration.MemorySize;
 
 import java.util.Map;
 
+import static org.apache.flink.table.descriptors.EttHBaseValidator.CONNECTOR_TYPE_VALUE_HBASE;
+
 /**
  * Created by yuchunfan on 2020/4/29.
  */
@@ -13,7 +15,7 @@ public class EttHBase extends ConnectorDescriptor {
     private DescriptorProperties properties = new DescriptorProperties();
 
     public EttHBase() {
-        super("hbase", 1, false);
+        super(CONNECTOR_TYPE_VALUE_HBASE, 1, false);
     }
 
     public EttHBase tableName(String tableName) {
