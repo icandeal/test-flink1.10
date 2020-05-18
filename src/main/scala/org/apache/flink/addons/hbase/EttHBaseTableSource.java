@@ -16,14 +16,8 @@ import org.apache.flink.table.sources.StreamTableSource;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HConstants;
 
 import java.util.Arrays;
-import java.util.Properties;
-
-import static org.apache.flink.table.descriptors.EttHBaseValidator.CONNECTOR_ZK_NODE_PARENT;
-import static org.apache.flink.table.descriptors.EttHBaseValidator.CONNECTOR_ZK_QUORUM;
 
 /**
  * Created by yuchunfan on 2020/4/30.
@@ -31,7 +25,6 @@ import static org.apache.flink.table.descriptors.EttHBaseValidator.CONNECTOR_ZK_
 public class EttHBaseTableSource implements BatchTableSource<Row>, ProjectableTableSource<Row>, StreamTableSource<Row>, LookupableTableSource<Row> {
 
     private final Configuration conf;
-    private final Properties prop;
     private final String tableName;
     private final HBaseTableSchema hbaseSchema;
     private final int[] projectFields;
@@ -39,20 +32,15 @@ public class EttHBaseTableSource implements BatchTableSource<Row>, ProjectableTa
     /**
      * The HBase configuration and the name of the table to read.
      *
-     * @param prop      hbase configuration
+     * @param conf      hbase configuration
      * @param tableName the tableName
      */
-    public EttHBaseTableSource(Properties prop, String tableName) {
-        this(prop, tableName, new HBaseTableSchema(), null);
+    public EttHBaseTableSource(Configuration conf, String tableName) {
+        this(conf, tableName, new HBaseTableSchema(), null);
     }
 
-    public EttHBaseTableSource(Properties prop, String tableName, HBaseTableSchema hbaseSchema, int[] projectFields) {
-        this.prop = prop;
-        this.conf = HBaseConfiguration.create();
-        String hbaseZk = this.prop.getProperty(CONNECTOR_ZK_QUORUM);
-        conf.set(HConstants.ZOOKEEPER_QUORUM, hbaseZk);
-        String zkNodeParent = this.prop.getProperty(CONNECTOR_ZK_NODE_PARENT);
-        if (zkNodeParent != null)conf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, zkNodeParent);
+    public EttHBaseTableSource(Configuration conf, String tableName, HBaseTableSchema hbaseSchema, int[] projectFields) {
+        this.conf = conf;
         this.tableName = Preconditions.checkNotNull(tableName, "Table  name");
         this.hbaseSchema = hbaseSchema;
         this.projectFields = projectFields;
@@ -102,13 +90,13 @@ public class EttHBaseTableSource implements BatchTableSource<Row>, ProjectableTa
     public DataSet<Row> getDataSet(ExecutionEnvironment execEnv) {
         HBaseTableSchema projectedSchema = hbaseSchema.getProjectedHBaseTableSchema(projectFields);
         return execEnv
-            .createInput(new EttHBaseRowInputFormat(prop, tableName, projectedSchema), getReturnType())
+            .createInput(new EttHBaseRowInputFormat(conf, tableName, projectedSchema), getReturnType())
             .name(explainSource());
     }
 
     @Override
-    public org.apache.flink.addons.hbase.EttHBaseTableSource projectFields(int[] fields) {
-        return new org.apache.flink.addons.hbase.EttHBaseTableSource(this.prop, tableName, hbaseSchema, fields);
+    public EttHBaseTableSource projectFields(int[] fields) {
+        return new EttHBaseTableSource(this.conf, tableName, hbaseSchema, fields);
     }
 
     @Override
@@ -155,7 +143,7 @@ public class EttHBaseTableSource implements BatchTableSource<Row>, ProjectableTa
     public DataStream<Row> getDataStream(StreamExecutionEnvironment execEnv) {
         HBaseTableSchema projectedSchema = hbaseSchema.getProjectedHBaseTableSchema(projectFields);
         return execEnv
-            .createInput(new EttHBaseRowInputFormat(this.prop, tableName, projectedSchema), getReturnType())
+            .createInput(new EttHBaseRowInputFormat(this.conf, tableName, projectedSchema), getReturnType())
             .name(explainSource());
     }
 

@@ -12,6 +12,9 @@ import org.apache.flink.table.sinks.StreamTableSink;
 import org.apache.flink.table.sources.StreamTableSource;
 import org.apache.flink.table.utils.TableSchemaUtils;
 import org.apache.flink.types.Row;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HConstants;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -25,6 +28,9 @@ import static org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CO
 import static org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CONNECTOR_TYPE;
 import static org.apache.flink.table.descriptors.DescriptorProperties.*;
 import static org.apache.flink.table.descriptors.EttHBaseValidator.*;
+import static org.apache.flink.table.descriptors.HBaseValidator.CONNECTOR_TABLE_NAME;
+import static org.apache.flink.table.descriptors.HBaseValidator.CONNECTOR_ZK_NODE_PARENT;
+import static org.apache.flink.table.descriptors.HBaseValidator.CONNECTOR_ZK_QUORUM;
 import static org.apache.flink.table.descriptors.Schema.*;
 import static org.apache.flink.table.descriptors.Schema.SCHEMA;
 
@@ -36,16 +42,19 @@ public class EttHBaseTableFactory implements StreamTableSourceFactory<Row>, Stre
     @Override
     public StreamTableSource<Row> createStreamTableSource(Map<String, String> properties) {
         final DescriptorProperties descriptorProperties = getValidatedProperties(properties);
-        Properties prop = new Properties();
-        properties.keySet().forEach(x -> {
-            prop.setProperty(x, properties.get(x));
-        });
+        // create default configuration from current runtime env (`hbase-site.xml` in classpath) first,
+        Configuration hbaseClientConf = HBaseConfiguration.create();
+        String hbaseZk = descriptorProperties.getString(CONNECTOR_ZK_QUORUM);
+        hbaseClientConf.set(HConstants.ZOOKEEPER_QUORUM, hbaseZk);
+        descriptorProperties
+            .getOptionalString(CONNECTOR_ZK_NODE_PARENT)
+            .ifPresent(v -> hbaseClientConf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, v));
 
         String hTableName = descriptorProperties.getString(CONNECTOR_TABLE_NAME);
         TableSchema tableSchema = TableSchemaUtils.getPhysicalSchema(
             descriptorProperties.getTableSchema(SCHEMA));
         HBaseTableSchema hbaseSchema = validateTableSchema(tableSchema);
-        return new EttHBaseTableSource(prop, hTableName, hbaseSchema, null);
+        return new EttHBaseTableSource(hbaseClientConf, hTableName, hbaseSchema, null);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.apache.flink.addons.hbase;
 
+import org.apache.flink.addons.hbase.util.HBaseConfigurationUtil;
 import org.apache.flink.addons.hbase.util.HBaseReadWriteHelper;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
@@ -7,7 +8,6 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.TableNotFoundException;
 import org.apache.hadoop.hbase.client.*;
@@ -15,10 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Properties;
-
-import static org.apache.flink.table.descriptors.EttHBaseValidator.CONNECTOR_ZK_NODE_PARENT;
-import static org.apache.flink.table.descriptors.EttHBaseValidator.CONNECTOR_ZK_QUORUM;
 
 /**
  * Created by yuchunfan on 2020/4/30.
@@ -32,12 +28,12 @@ public class EttHBaseRowInputFormat extends AbstractTableInputFormat<Row> implem
     private final String tableName;
     private final HBaseTableSchema schema;
 
-    private Properties prop;
+    private byte[] bytesConf;
     private transient HBaseReadWriteHelper readHelper;
 
-    public EttHBaseRowInputFormat(Properties prop, String tableName, HBaseTableSchema schema) {
+    public EttHBaseRowInputFormat(org.apache.hadoop.conf.Configuration conf, String tableName, HBaseTableSchema schema) {
         this.tableName = tableName;
-        this.prop = prop;
+        this.bytesConf = HBaseConfigurationUtil.serializeConfiguration(conf);
         this.schema = schema;
     }
 
@@ -69,11 +65,10 @@ public class EttHBaseRowInputFormat extends AbstractTableInputFormat<Row> implem
 
     private void connectToTable() {
         try {
-            org.apache.hadoop.conf.Configuration conf = HBaseConfiguration.create();
-            String hbaseZk = this.prop.getProperty(CONNECTOR_ZK_QUORUM);
-            conf.set(HConstants.ZOOKEEPER_QUORUM, hbaseZk);
-            String zkNodeParent = this.prop.getProperty(CONNECTOR_ZK_NODE_PARENT);
-            if (zkNodeParent != null)conf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, zkNodeParent);
+            org.apache.hadoop.conf.Configuration conf = HBaseConfigurationUtil.deserializeConfiguration(
+                bytesConf,
+                HBaseConfiguration.create()
+            );
             Connection conn = ConnectionFactory.createConnection(conf);
             super.table = (HTable) conn.getTable(TableName.valueOf(tableName));
         } catch (TableNotFoundException tnfe) {
