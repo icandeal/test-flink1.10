@@ -100,7 +100,8 @@ object TestHBaseRead {
         | a.user_id,
         | b.info.ett_user_id AS jid,
         | b.info.dc_school_id AS dc_school_id
-        |FROM uzer a INNER JOIN user_info_mysql_user_id AS b
+        |FROM uzer a INNER JOIN user_info_mysql_user_id
+        | FOR SYSTEM_TIME AS OF a.proctime AS b
         | ON a.user_id=b.rowkey
         |""".stripMargin)
 
