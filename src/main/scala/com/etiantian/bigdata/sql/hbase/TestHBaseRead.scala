@@ -75,22 +75,22 @@ object TestHBaseRead {
         | )
         |""".stripMargin)
     // Flink SQL use HBase Connector to connect hbase
-//    tenv.connect(
-//      new EttHBase()
-//        .tableName("user_info_mysql_user_id")
-//        .zookeeperQuorum("test-hadoop1:2181,test-hadoop2:2181,test-hadoop3:2181")
-//        .zookeeperNodeParent("/hbase")
-//        .writeBufferFlushMaxRows(1000)
-//        .writeBufferFlushMaxSize("10mb")
-//        .writeBufferFlushInterval("1s")
-//    ).withSchema(
-//      new Schema()
-//        .field("rowkey", DataTypes.STRING())
-//        .field("info", DataTypes.ROW(
-//          DataTypes.FIELD("ett_user_id", DataTypes.STRING()),
-//          DataTypes.FIELD("dc_school_id", DataTypes.STRING())
-//        ))
-//    ).createTemporaryTable("user_info_mysql_user_id")
+    tenv.connect(
+      new EttHBase()
+        .tableName("user_info_mysql_user_id")
+        .zookeeperQuorum("test-hadoop1:2181,test-hadoop2:2181,test-hadoop3:2181")
+        .zookeeperNodeParent("/hbase")
+        .writeBufferFlushMaxRows(1000)
+        .writeBufferFlushMaxSize("10mb")
+        .writeBufferFlushInterval("1s")
+    ).withSchema(
+      new Schema()
+        .field("rowkey", DataTypes.STRING())
+        .field("info", DataTypes.ROW(
+          DataTypes.FIELD("ett_user_id", DataTypes.STRING()),
+          DataTypes.FIELD("dc_school_id", DataTypes.STRING())
+        ))
+    ).createTemporaryTable("user_info_mysql_user_id")
 
     tenv.from("uzer").toAppendStream[Row].print()
 

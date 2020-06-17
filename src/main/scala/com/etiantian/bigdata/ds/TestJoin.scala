@@ -49,7 +49,7 @@ object TestJoin {
 
     val uds = userDS.map(x => new JSONObject(x)).map(x => (x.get("uid").toString, x.getString("name"), x.get("age").toString))
     val cuds = classUserDS.map(x => new JSONObject(x)).map(x => (x.get("uid").toString, x.get("cid").toString, x.get("utype").toString))
-    uds.join(cuds).where(x => x._1).equalTo(x => x._1).window(
+    uds.join(cuds).where(_._1).equalTo(_._1).window(
       TumblingProcessingTimeWindows.of(Time.seconds(10))
     ).apply(new JoinFunction[(String, String, String),(String,String,String),(String,String, String,String,String, String)] {
       override def join(first: (String, String, String), second: (String,String,String)): (String,String, String,String, String, String) = {
